@@ -32,15 +32,35 @@ final class RbacSyncCursorsModule implements ModuleInterface
         $table = SqlIdentifier::qi($db, $this->table());
         $view  = SqlIdentifier::qi($db, self::contractView());
 
+        if ($d->isMysql()) {
+            $createViewSql = <<<'SQL'
+CREATE OR REPLACE ALGORITHM=MERGE SQL SECURITY INVOKER VIEW vw_rbac_sync_cursors AS
+SELECT
+  repo_id,
+  peer,
+  last_commit,
+  last_synced_at
+FROM rbac_sync_cursors;
+SQL;
+        } else {
+            $createViewSql = <<<'SQL'
+CREATE OR REPLACE VIEW vw_rbac_sync_cursors AS
+SELECT
+  repo_id,
+  peer,
+  last_commit,
+  last_synced_at
+FROM rbac_sync_cursors;
+SQL;
+        }
+
         if (\class_exists('\\BlackCat\\Database\\Support\\DdlGuard')) {
-            (new \BlackCat\Database\Support\DdlGuard($db, $d))->applyCreateView(
-                "CREATE VIEW {$view} AS SELECT * FROM {$table}"
-            );
+            (new \BlackCat\Database\Support\DdlGuard($db, $d))->applyCreateView($createViewSql);
         } else {
             // Prefer CREATE OR REPLACE VIEW (gentle on dependencies)
-            $sql = "CREATE OR REPLACE VIEW {$view} AS SELECT * FROM {$table}";
-            $db->exec($sql);
+            $db->exec($createViewSql);
         }
+
     }
 
     public function upgrade(Database $db, SqlDialect $d, string $from): void
@@ -69,6 +89,13 @@ final class RbacSyncCursorsModule implements ModuleInterface
 
         // Quick index/FK check – generator injects names (case-sensitive per DB)
         $expectedIdx = [];
+        if ($d->isMysql()) {
+            // Drop PG-only index naming patterns (e.g., GIN/GiST)
+            $expectedIdx = array_values(array_filter(
+                $expectedIdx,
+                static fn(string $n): bool => !str_starts_with($n, 'gin_') && !str_starts_with($n, 'gist_')
+            ));
+        }
         $expectedFk  = [ 'fk_rbac_cursors_repo' ];
 
         $haveIdx = $hasTable ? SchemaIntrospector::listIndexes($db, $d, $table)     : [];
