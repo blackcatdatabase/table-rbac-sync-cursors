@@ -1,6 +1,7 @@
--- Auto-generated from schema-map-postgres.psd1 (map@62c9c93)
+-- Auto-generated from schema-map-postgres.yaml (map@sha1:F0EE237771FBA8DD7C4E886FF276F91A862C3718)
 -- engine: postgres
 -- table:  rbac_sync_cursors
+
 CREATE TABLE IF NOT EXISTS rbac_sync_cursors (
   repo_id BIGINT NOT NULL,
   peer VARCHAR(120) NOT NULL,                    -- consumer identifier (application/DB)

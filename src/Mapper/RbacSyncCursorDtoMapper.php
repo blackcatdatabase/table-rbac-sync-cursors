@@ -17,7 +17,7 @@ use BlackCat\Database\Support\DtoHydrator;
 final class RbacSyncCursorDtoMapper
 {
     /** @var array<string,string> Column -> DTO property */
-    private const COL_TO_PROP = [ 'repo_id' => 'repoId', 'last_commit' => 'lastCommit', 'last_synced_at' => 'lastSyncedAt' ];
+    private const COL_TO_PROP = [ 'repo_id' => 'repoId', 'peer' => 'peer', 'last_commit' => 'lastCommit', 'last_synced_at' => 'lastSyncedAt' ];
 
     /** @var string[] */
     private const BOOL_COLS   = [];
@@ -39,13 +39,8 @@ final class RbacSyncCursorDtoMapper
 
     private static function tz(): DateTimeZone
     {
-        if (self::$tzObj instanceof DateTimeZone) {
-            return self::$tzObj;
-        }
-        try {
+        if (!(self::$tzObj instanceof DateTimeZone)) {
             self::$tzObj = new DateTimeZone(self::TZ);
-        } catch (\Throwable) {
-            self::$tzObj = new DateTimeZone('UTC');
         }
         return self::$tzObj;
     }
