@@ -1,0 +1,20 @@
+{
+  "tables": {
+    "rbac_sync_cursors": {
+      "columns": {
+        "last_commit": {
+          "strategy": "passthrough"
+        },
+        "last_synced_at": {
+          "strategy": "passthrough"
+        },
+        "peer": {
+          "strategy": "passthrough"
+        },
+        "repo_id": {
+          "strategy": "passthrough"
+        }
+      }
+    }
+  }
+}
