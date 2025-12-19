@@ -41,11 +41,11 @@ final class Criteria extends BaseCriteria
         return [ 'peer', 'last_commit' ];
     }
 
-/** Columns allowed in ORDER BY (falls back to filterable() when empty). */
-protected function sortable(): array
-{
-    return [ 'repo_id', 'peer', 'last_commit', 'last_synced_at' ];
-}
+    /** Columns allowed in ORDER BY (falls back to filterable() when empty). */
+    protected function sortable(): array
+    {
+        return [ 'repo_id', 'peer', 'last_commit', 'last_synced_at' ];
+    }
 
     /**
      * Whitelist of joinable entities (for safe ->join() usage):
